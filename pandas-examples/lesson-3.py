@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+import matplotlib.pyplot as plt
+
 
 
 def symbol_to_path(symbol, base_dir="data"):
@@ -39,20 +41,34 @@ def test_run1(start, end):
         df_temp = df_temp.rename(columns={'Adj Close': name})
         df1 = df1.join(df_temp, how="left")
     # drop nan
-    df1 = df1.dropna()
+    df1 = df1.dropna(subset=['SPY'])
     print df1
+
+
+def normalize_data(df):
+    return df / df.ix[0]
 
 
 def main():
     # Define a date range
-    dates = pd.date_range('2017-11-01', '2017-11-13')
+    dates = pd.date_range('2017-10-13', '2017-11-13')
 
     # Choose stock symbols to read
     symbols = ['JD', 'DIS', 'BABA']
 
     # Get stock data
     df = get_data(symbols, dates)
+
     print df
+    print df.ix['2017-10-20':'2017-10-25']
+    print df['JD']
+    print df[['JD', 'DIS']]
+    print df.ix['2017-10-25':'2017-10-30', ['JD', 'DIS']]
+
+    ax = normalize_data(df).plot(title="Stock Price")
+    ax.set_xlabel("Price")
+    ax.set_ylabel("Date")
+    plt.show()
 
 
 if __name__ == "__main__":

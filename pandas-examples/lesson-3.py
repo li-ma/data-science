@@ -63,12 +63,11 @@ def main():
     print df.ix['2017-10-20':'2017-10-25']
     print df['JD']
     print df[['JD', 'DIS']]
-    print df.ix['2017-10ax = normalize_data(df).plot(title="Stock Price")
+    print df.ix['2017-10']
+    ax = normalize_data(df).plot(title="Stock Price")
     ax.set_xlabel("Price")
     ax.set_ylabel("Date")
-    plt.show()-25':'2017-10-30', ['JD', 'DIS']]
-
-
+    plt.show()
 
 
 if __name__ == "__main__":

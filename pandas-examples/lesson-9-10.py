@@ -1,10 +1,11 @@
-"""Daily Returns"""
+"""Portfolio Optimizer"""
 
 import math
 import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy.optimize as spo
 
 
 def symbol_to_path(symbol, base_dir="data"):
@@ -54,15 +55,20 @@ def normalize_data(df):
     return df / df.ix[0]
 
 
-def test_portfolio():
+def test_optimizer():
+    # f(x) = -1 * sharpe ratio
+    # initial x = allocation of stocks
+    # range x = [0, 1]
+    # constraints x: sum(x) = 1.0
+    pass
+
+
+def fx(allocs):
     # Read data
     dates = pd.date_range('2016-11-12', '2017-11-12')
-    symbols = ['JD', 'BABA']
+    symbols = ['JD', 'BABA', 'DIS']
     df = get_data(symbols, dates)
-
-    # Model portfolio
-    start_val = 1000000  # 1 million
-    allocs = [0.4, 0.3, 0.3]
+    start_val = 100000
 
     normed = normalize_data(df)
     alloced = normed * allocs
@@ -71,18 +77,25 @@ def test_portfolio():
 
     # Compute Daily Returns
     daily_returns = compute_daily_returns(port_val)
-    cumulative_returns = compute_cumulative_returns(port_val)
     avg_daily_returns = daily_returns.mean()
     std_daily_returns_risk = daily_returns.std()
     daily_risk_free = math.log(1.0 + 0.1, 252) - 1.0
     sampling_rate = math.sqrt(252)  # weekly: 52, monthly: 12
     sharpe_ratio = sampling_rate * (avg_daily_returns - daily_risk_free) / std_daily_returns_risk
+    return sharpe_ratio * (-1.0)
 
-    print 'Portfolio Statistics:\n'
-    print 'Cumulative Returns: ', cumulative_returns
-    print 'Average Daily Returns: ', avg_daily_returns
-    print 'Risk - Standard Deviation of Daily Returns: ', std_daily_returns_risk
-    print 'Sharpe Ratio: ', sharpe_ratio
+
+def test_portfolio():
+    # Model portfolio
+    allocs = [0.2, 0.2, 0.3, 0.3]
+
+    min_result = spo.minimize(fx,
+                              allocs,
+                              method='SLSQP',
+                              bounds=((0.0, 1.0), (0.0, 1.0), (0.0, 1.0), (0.0, 1.0)),
+                              constraints=({'type': 'eq', 'fun': lambda x:  x[0] + x[1] + x[2] + x[3] - 1.0},),
+                              options={'disp': True})
+    print 'Sharpe Ratio: ', min_result
 
 
 if __name__ == "__main__":

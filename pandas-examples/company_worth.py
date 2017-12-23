@@ -13,5 +13,6 @@ def book_value(total_asset, intangible_asset, liabilities):
     return (total_asset - intangible_asset - liabilities)
 
 
-def market_capitalization(total_shares, stock_price):
-    return total_shares * stock_price
+def market_capitalization(avail_shares, stock_price):
+    # avail_shares: available shares in the market
+    return avail_shares * stock_price
